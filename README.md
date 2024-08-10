@@ -1,7 +1,7 @@
 ## ImmutableEncoder{8,16,32}
 
 We all love immutable types in Solidity. I mean, variables inlined in the bytecode at construction time, that's wild!
-But being limited to only value types can suck at times. Maybe you want the flexibility of an array of addresses, a struct or god-forbid a string.
+But being limited to only value types can suck at times - maybe you want the flexibility of an array of addresses, a struct or god-forbid a string.
 Well, look no further! ImmutableEncoder{8,16,32} gives you the full range of solidity types with the gas efficiency of immutable variables.
 
 ### How, you ask?
