@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+import {Test, console} from "forge-std/Test.sol";
+import {ImmutableEncoder4} from "src/ImmutableEncoder4.sol";
+
+struct Params {
+    address[] values;
+    bool isFunky;
+}
+
+contract Example is ImmutableEncoder4 {
+    constructor(
+        Params memory params
+    ) ImmutableEncoder4(abi.encodePacked(params)) {}
+
+    function getParams() public view returns (Params memory) {
+        return abi.decode(params(), (Params));
+    }
+}
+
+contract ImmutableEncoder4Test is Test {
+    function setUp() public {
+        address[4] memory values = [
+            address(1),
+            address(2),
+            address(3),
+            address(4)
+        ];
+        Params memory params = Params(values, true);
+        Example = new Example(params);
+    }
+
+    function test_get() public view {
+        address val = counter.get(1);
+        assertEq(val, address(2));
+    }
+}

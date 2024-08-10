@@ -1,66 +1,47 @@
-## Foundry
+## ImmutableEncoder{8,16,32}
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+We all love immutable types in Solidity. I mean, variables inlined in the bytecode at construction time, that's wild!
+But being limited to only value types can suck at times. Maybe you want the flexibility of an array of addresses, a struct or god-forbid a string.
+Well, look no further! ImmutableEncoder{8,16,32} gives you the full range of solidity types with the gas efficency of immutable variables.
 
-Foundry consists of:
+### How, you ask?
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+Well nothing amazing. We declare a bunch (i.e. 8, 16 or 32) of `immutable bytes32 slotXX` which will act as a continous memory location supporting max 256, 512 and 1024 bytes respectively. 
+We `abi.encode` a struct that we want to write into a `bytes` that we pad to the full length of the memory location. 
+We, quite frankly, dangerously cast `bytes` to `bytes32[]` by modifying it's memory structure in assembly, because we like living dangerously.
+We save each element of the array into the `slotXX` immutable variables. 
+Later on, we revers this by creating a `bytes32[]` from the `slotXX` immutable variables, we assembly-foo it into a `bytes` type and then `abi.decode` the hell out of that struct.
 
-## Documentation
+### Why, you ask?
 
-https://book.getfoundry.sh/
+For science.
 
 ## Usage
 
-### Build
+```solidity
+struct Params {
+    string test;
+    address[] addrs;
+    bool isFunky;
+}
 
-```shell
-$ forge build
+contract Example is ImmutableEncoder16 {
+    constructor(Params memory params) ImmutableEncoder16(abi.encode(params)) {}
+
+    function doSomething() {
+      Params memory params = getParams();
+      // ...
+    }
+
+    function getParams() public view returns (Params memory) {
+        return abi.decode(params(), (Params));
+    }
+}
 ```
 
-### Test
+### Install
 
-```shell
-$ forge test
+```bash
+forge install bowd/immutable-encoder
 ```
 
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
