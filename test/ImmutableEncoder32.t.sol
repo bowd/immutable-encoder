@@ -14,7 +14,7 @@ contract Example is ImmutableEncoder32 {
     constructor(Params memory params) ImmutableEncoder32(abi.encode(params)) {}
 
     function getParams() public view returns (Params memory) {
-        return abi.decode(params(), (Params));
+        return abi.decode(getEncodedData(), (Params));
     }
 }
 

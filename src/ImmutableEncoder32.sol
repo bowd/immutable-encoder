@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8;
 
-contract ImmutableEncoder32 {
+import "./ImmutableEncoder.sol";
+
+contract ImmutableEncoder32 is ImmutableEncoder {
     bytes32 private immutable slot0;
     bytes32 private immutable slot1;
     bytes32 private immutable slot2;
@@ -34,26 +36,9 @@ contract ImmutableEncoder32 {
     bytes32 private immutable slot29;
     bytes32 private immutable slot30;
     bytes32 private immutable slot31;
-    uint256 private immutable dataLength;
-    uint8 constant SLOTS = 32;
-    uint32 constant BYTES = uint32(SLOTS) * 32;
 
-    constructor(bytes memory data) {
-        if (data.length > BYTES) revert("ImmutableHelper: data too large");
-        dataLength = data.length;
-        // XXX: This is probably not necesary, it doesn't matter
-        // if we encode junk at the end (and there probably isn't at this point)
-        // as long as we decode only the length we'll cut it, but padding feels safer.
-        bytes memory dataFullLength = new bytes(BYTES);
-        for (uint256 i = 0; i < data.length; i++) {
-            dataFullLength[i] = data[i];
-        }
-
-        bytes32[] memory slots;
-        assembly {
-            mstore(dataFullLength, SLOTS)
-            slots := dataFullLength
-        }
+    constructor(bytes memory data) ImmutableEncoder(32, data.length) {
+        bytes32[] memory slots = bytesToBytes32Array(data);
 
         slot0 = slots[0];
         slot1 = slots[1];
@@ -89,9 +74,13 @@ contract ImmutableEncoder32 {
         slot31 = slots[31];
     }
 
-    function params() internal view returns (bytes memory) {
-        bytes memory data;
-        bytes32[] memory slots = new bytes32[](SLOTS);
+    function readSlots()
+        internal
+        view
+        override
+        returns (bytes32[] memory slots)
+    {
+        slots = new bytes32[](32);
         slots[0] = slot0;
         slots[1] = slot1;
         slots[2] = slot2;
@@ -124,14 +113,5 @@ contract ImmutableEncoder32 {
         slots[29] = slot29;
         slots[30] = slot30;
         slots[31] = slot31;
-
-        uint256 _dataLength = dataLength;
-
-        assembly {
-            mstore(slots, _dataLength)
-            data := slots
-        }
-
-        return data;
     }
 }

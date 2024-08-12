@@ -14,7 +14,7 @@ contract Example is ImmutableEncoder16 {
     constructor(Params memory params) ImmutableEncoder16(abi.encode(params)) {}
 
     function getParams() public view returns (Params memory) {
-        return abi.decode(params(), (Params));
+        return abi.decode(getEncodedData(), (Params));
     }
 }
 
@@ -32,6 +32,8 @@ contract ImmutableEncoder16Test is Test {
         console.log(abi.encode(params).length);
         example = new Example(params);
     }
+
+    function test_dataTooLarge() public {}
 
     function test_getParams() public view {
         Params memory saved = example.getParams();
