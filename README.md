@@ -26,12 +26,19 @@ For science.
 
 ## Usage
 
+### Install
+
 ```bash
 forge install bowd/immutable-encoder
 
 ```
 
+### Usage with pre-defined encoder sizes
+
+There are 3 pre-defined encoder sizes with 8, 16 and 32 slots, that can be used directly.
+
 ```solidity
+// Example with struct
 struct Params {
     string test;
     address[] addrs;
@@ -46,10 +53,18 @@ contract Example is ImmutableEncoder16 {
       // ...
     }
 
-    function getParams() public view returns (Params memory) {
-        return abi.decode(params(), (Params));
+    function getParams() internal view returns (Params memory) {
+        return abi.decode(getEncodedBytes(), (Params));
     }
 }
 ```
 
+### Usage with custom slot sizes
 
+You can generate a custom encoder with your own size using the provided script.
+
+```bash
+$ ./lib/immutable-encoder/bin/gen-encoder.sh <slots>
+```
+
+This will create an `ImmutableEncoder${slots}.sol` file locally that you can then import and use in the same way.

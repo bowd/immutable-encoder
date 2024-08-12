@@ -22,7 +22,7 @@ abstract contract ImmutableEncoder {
 
     function readSlots() internal view virtual returns (bytes32[] memory);
 
-    function getEncodedData() internal view returns (bytes memory data) {
+    function getEncodedBytes() internal view returns (bytes memory data) {
         return bytes32ArrayToBytes(readSlots());
     }
 
