@@ -14,7 +14,7 @@ contract Example is ImmutableEncoder32 {
     constructor(Params memory params) ImmutableEncoder32(abi.encode(params)) {}
 
     function getParams() public view returns (Params memory) {
-        return abi.decode(getEncodedData(), (Params));
+        return abi.decode(getEncodedBytes(), (Params));
     }
 }
 
@@ -28,8 +28,6 @@ contract ImmutableEncoder32Test is Test {
             addrs[i] = address(uint160(10 + i));
         }
         params = Params("Test", addrs, true);
-        console.logBytes(abi.encode(params));
-        console.log(abi.encode(params).length);
         example = new Example(params);
     }
 
